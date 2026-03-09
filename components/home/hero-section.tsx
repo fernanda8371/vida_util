@@ -35,22 +35,6 @@ export function HeroSection() {
           </Link>
         </div>
       </div>
-
-      {/* Decorative element at bottom */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 hidden sm:block">
-        <div className="w-12 h-12 bg-[#f5f5f5] rounded-full flex items-center justify-center">
-          <svg width="24" height="24" viewBox="0 0 60 60" fill="none">
-            <g transform="translate(15, 15)">
-              <circle cx="15" cy="8" r="5" fill="#4ade80" />
-              <circle cx="8" cy="15" r="5" fill="#4ade80" />
-              <circle cx="22" cy="15" r="5" fill="#4ade80" />
-              <circle cx="10" cy="24" r="5" fill="#4ade80" />
-              <circle cx="20" cy="24" r="5" fill="#4ade80" />
-              <circle cx="15" cy="16" r="4" fill="#1a2744" />
-            </g>
-          </svg>
-        </div>
-      </div>
     </section>
   )
 }

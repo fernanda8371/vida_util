@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Send } from "lucide-react"
+import { Send, CheckCircle2, AlertCircle } from "lucide-react"
 
 export function ContactoForm() {
   const [formData, setFormData] = useState({
@@ -11,10 +11,70 @@ export function ContactoForm() {
     service: "",
     message: ""
   })
+  
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
+    setStatus('loading')
+    setErrorMessage("")
+
+    try {
+      // Construir el mensaje completo
+      const fullMessage = `
+DATOS DE CONTACTO:
+-------------------
+Nombre: ${formData.name}
+Email: ${formData.email}
+Teléfono: ${formData.phone || 'No proporcionado'}
+Servicio de interés: ${formData.service || 'No especificado'}
+
+MENSAJE:
+-------------------
+${formData.message}
+      `.trim()
+
+      // Enviar directamente a Web3Forms desde el cliente
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: '849f4881-f63c-466f-9835-44486a5d8ed3',
+          name: formData.name,
+          email: formData.email,
+          message: fullMessage,
+          subject: `Nuevo mensaje de contacto - ${formData.name}`,
+          from_name: formData.name,
+          replyto: formData.email
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setStatus('success')
+        // Limpiar formulario
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          service: "",
+          message: ""
+        })
+        // Reset estado después de 5 segundos
+        setTimeout(() => setStatus('idle'), 5000)
+      } else {
+        setStatus('error')
+        setErrorMessage(data.message || 'Error al enviar el mensaje')
+      }
+    } catch (error) {
+      setStatus('error')
+      setErrorMessage('Error de conexión. Por favor intenta de nuevo.')
+      console.error('Error:', error)
+    }
   }
 
   return (
@@ -108,11 +168,37 @@ export function ContactoForm() {
 
           <button
             type="submit"
-            className="w-full sm:w-auto bg-[#4ade80] hover:bg-[#22c55e] text-[#1a2744] px-8 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 mx-auto"
+            disabled={status === 'loading'}
+            className="w-full sm:w-auto bg-[#4ade80] hover:bg-[#22c55e] text-[#1a2744] px-8 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Send size={18} />
-            Enviar mensaje
+            {status === 'loading' ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1a2744]"></div>
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                Enviar mensaje
+              </>
+            )}
           </button>
+
+          {/* Mensaje de éxito */}
+          {status === 'success' && (
+            <div className="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-xl justify-center">
+              <CheckCircle2 size={20} />
+              <span className="text-sm font-medium">¡Mensaje enviado correctamente! Nos pondremos en contacto pronto.</span>
+            </div>
+          )}
+
+          {/* Mensaje de error */}
+          {status === 'error' && (
+            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-xl justify-center">
+              <AlertCircle size={20} />
+              <span className="text-sm font-medium">{errorMessage}</span>
+            </div>
+          )}
         </form>
       </div>
     </section>

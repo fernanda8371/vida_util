@@ -18,12 +18,6 @@ const galleryItems = [
     title: "Servicios Contables",
     subtitle: "Para negocios",
     href: "/servicios#contabilidad"
-  },
-  {
-    tag: "ASESORÍA",
-    title: "Consultoría Patrimonial",
-    subtitle: "Personalizada",
-    href: "/contacto"
   }
 ]
 
@@ -43,7 +37,7 @@ export function ServicesGallery() {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {galleryItems.map((item, index) => (
             <Link 
               key={index}

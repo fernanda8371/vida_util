@@ -8,20 +8,25 @@ import { usePathname } from "next/navigation"
 
 export function Header({ variant = "light" }: { variant?: "light" | "dark" }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
+  const isHome = pathname === "/"
+  
+  // En páginas internas, el header siempre tiene fondo
+  const [isScrolled, setIsScrolled] = useState(!isHome)
   
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      setIsScrolled(window.scrollY > 50 || !isHome)
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [isHome])
 
   useEffect(() => {
     setIsMenuOpen(false)
-  }, [pathname])
+    // Actualizar isScrolled cuando cambia la ruta
+    setIsScrolled(!isHome)
+  }, [pathname, isHome])
 
   const bgColor = isScrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
   const textColor = isScrolled ? "text-[#1a2744]" : variant === "dark" ? "text-white" : "text-[#1a2744]"
@@ -31,15 +36,17 @@ export function Header({ variant = "light" }: { variant?: "light" | "dark" }) {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-3 sm:py-4 transition-all duration-300 ${bgColor}`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo size={32} />
-          <div className="hidden xs:block">
-            <span className={`font-semibold text-base sm:text-lg ${logoTextColor} transition-colors`}>
+        <Link href="/" className="flex items-center gap-3">
+          {/* Desktop: Logo completo */}
+          <div className="hidden sm:block">
+            <Logo size={50} variant="full" />
+          </div>
+          {/* Mobile: Solo ícono con texto */}
+          <div className="sm:hidden flex items-center gap-2">
+            <Logo size={32} variant="icon" />
+            <span className={`font-semibold text-base ${logoTextColor} transition-colors`}>
               Vida Util
             </span>
-            <p className={`text-[10px] sm:text-xs ${subtitleColor} transition-colors hidden sm:block`}>
-              Consultores y Asesores Patrimoniales
-            </p>
           </div>
         </Link>
 
@@ -67,7 +74,7 @@ export function Header({ variant = "light" }: { variant?: "light" | "dark" }) {
           className={`lg:hidden p-2 ${textColor} transition-colors`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
-          aria-expanded={isMenuOpen}
+          aria-expanded={isMenuOpen ? "true" : "false"}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>

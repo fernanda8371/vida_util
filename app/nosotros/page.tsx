@@ -17,7 +17,7 @@ export default function NosotrosPage() {
       <Header variant="light" />
       <NosotrosHero />
       <NosotrosContent />
-      <NosotrosTeam />
+      {/* <NosotrosTeam /> */}
       <ContactSection />
       <Footer />
     </main>
